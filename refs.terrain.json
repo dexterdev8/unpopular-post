@@ -1,0 +1,15 @@
+{
+  "testnet": {
+    "unpopular_post": {
+      "codeId": "66503"
+    }
+  },
+  "localterra": {
+    "unpopular_post": {
+      "codeId": "11",
+      "contractAddresses": {
+        "default": "terra1pt02qk6ajam2q4xsfe62e9zr8qxl6hc2gw236c"
+      }
+    }
+  }
+}
