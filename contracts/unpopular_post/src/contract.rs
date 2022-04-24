@@ -115,7 +115,7 @@ mod tests {
         let msg = ExecuteMsg::NewPost {
             msg: "50Cent should change his name to 50Dollar due to inflation".to_string(),
         };
-        let _res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();
+        let _res = execute(deps.as_mut(), mock_env(), info.clone(), msg).unwrap();
 
         let res = query(deps.as_ref(), mock_env(), QueryMsg::GetPosts {}).unwrap();
         let posts_map: PostResponse = from_binary(&res).unwrap();
@@ -126,5 +126,33 @@ mod tests {
             info.sender, post.owner_id,
             "Sender should be the owner of this post"
         );
+    }
+
+    #[test]
+    fn test_like() {
+        let mut deps = mock_dependencies(&coins(2, "token"));
+
+        let msg = InstantiateMsg {};
+        let info = mock_info("creator", &coins(2, "token"));
+        let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
+
+        let info = mock_info("anyone", &coins(2, "token"));
+        let msg = ExecuteMsg::NewPost {
+            msg: "Hello Terra".to_string(),
+        };
+        let _res = execute(deps.as_mut(), mock_env(), info.clone(), msg.clone()).unwrap();
+
+        let like = ExecuteMsg::LikePost { id: 0 };
+        let _res = execute(deps.as_mut(), mock_env(), info.clone(), like).unwrap();
+        let res = query(deps.as_ref(), mock_env(), QueryMsg::GetPosts {}).unwrap();
+        let posts_map: PostResponse = from_binary(&res).unwrap();
+        let post = posts_map.posts[0].clone();
+        let post_list_len = posts_map.posts.len();
+        assert_eq!(post_list_len, 1, "Post list should contain one post");
+        assert_eq!(
+            info.sender, post.owner_id,
+            "Sender should be the owner of this post"
+        );
+        assert_eq!(post.likes, 1, "Number of likes should be 1")
     }
 }
